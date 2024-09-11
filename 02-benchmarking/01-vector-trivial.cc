@@ -19,13 +19,19 @@ TEST_CASE("Trivial Vector") {
   std::vector<DataType> v;
 
   BENCHMARK_ADVANCED("Vector Lookup")(Catch::Benchmark::Chronometer meter) {
+    std::vector<DataType> v;
+    v.resize(DATASET_SIZE);
     for (size_t i = 0; i < DATASET_SIZE; i++) {
       v.emplace_back(i * 2);
     }
     meter.measure([&] {
-      for (size_t i = 0; i < ITERATIONS; i += STRIDE) {
-        volatile DataType a = v[i % DATASET_SIZE];
+      size_t idx = 0;
+      size_t sum = 0;
+      for (size_t i = 0; i < ITERATIONS; ++i) {
+        sum += v[idx % DATASET_SIZE];
+        idx += STRIDE;
       }
+      return sum;
     });
   };
 }
